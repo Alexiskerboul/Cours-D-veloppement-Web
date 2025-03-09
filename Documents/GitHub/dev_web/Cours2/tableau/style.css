@@ -1,0 +1,39 @@
+.root{
+    font-family: "Monteserrat", sans-serif;
+    font-optical-sizing:auto;
+    font-weight:300;
+    font-style:normal;
+    text-align:center;
+    border: 1px solid #000
+}
+
+.root2{
+    font-family: "Monteserrat", sans-serif;
+    font-optical-sizing:auto;
+    font-weight:bold;
+    font-style:normal;
+    text-align:center;
+    padding: 8px;
+    border: 1px solid #000
+}
+
+.root3{
+    font-family: "Monteserrat", sans-serif;
+    font-optical-sizing:auto;
+    font-size:20px;
+    font-weight:bold;
+    font-style:normal;
+    line-height: 1.6;
+    text-align:center;
+    border: 1px solid #000
+}
+
+.root4{
+    font-family: "Monteserrat", sans-serif;
+    font-optical-sizing:auto;
+    font-weight:300;
+    font-style:normal;
+    font-weight:bold;
+
+    text-align:center
+}
