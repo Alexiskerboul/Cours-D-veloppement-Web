@@ -1,13 +1,74 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Mon premier JavaScript</title>
-  </head>
-  <body>
-    <h1>Titre</h1>
-    <script>
-      const titre = "Hello"
-      console.log("Bonjour depuis JavaScript !");
-    </script>
-  </body>
-</html>
+<div class="game-container">
+  <canvas id="gameCanvas" width="800" height="400"></canvas>
+  <div id="score">Score : 0</div>
+</div>
+
+<style>
+  .game-container {
+    text-align: center;
+    margin: 20px;
+  }
+  #gameCanvas {
+    border: 2px solid black;
+    background: #87ceeb; /* Ciel bleu */
+  }
+  #score {
+    font-size: 24px;
+    margin-top: 10px;
+  }
+</style>
+
+// Configuration du jeu
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const scoreElement = document.getElementById("score");
+
+// Paramètres du jeu
+const GRAVITY = 0.3;
+const JUMP_FORCE = -7;
+const OBSTACLE_SPEED = 3;
+const OBSTACLE_WIDTH = 50;
+const GAP_HEIGHT = 150;
+
+// État du jeu
+let score = 0;
+let gameOver = false;
+
+// Joueur (le cercle)
+const player = {
+  x: 150,
+  y: canvas.height / 2,
+  radius: 20,
+  velocity: 0,
+
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = "yellow";
+    ctx.fill();
+    ctx.strokeStyle = "black";
+    ctx.stroke();
+  },
+
+  update() {
+    this.velocity += GRAVITY;
+    this.y += this.velocity;
+
+    // Empêcher le joueur de sortir du canvas
+    if (this.y + this.radius > canvas.height) {
+      this.y = canvas.height - this.radius;
+      this.velocity = 0;
+    }
+    if (this.y - this.radius < 0) {
+      this.y = this.radius;
+      this.velocity = 0;
+    }
+  },
+
+  jump() {
+    this.velocity = JUMP_FORCE;
+  },
+};
+
+// Obstacles
+const obstacles = [];

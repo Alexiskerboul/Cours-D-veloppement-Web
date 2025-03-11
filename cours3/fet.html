@@ -1,0 +1,58 @@
+<div class="swapi-interface">
+    <input type="number" id="characterId" value="1" min="1" />
+    <button id="loadButton">Charger le personnage</button>
+    <div id="characterInfo">
+      Entrez un ID et cliquez sur le bouton pour charger un personnage
+    </div>
+  </div>
+  
+  <script>
+    const characterIdInput = document.getElementById("characterId");
+    const loadButton = document.getElementById("loadButton");
+    const characterInfo = document.getElementById("characterInfo");
+  
+    function loadCharacter() {
+      // TODO: implémenter la fonction
+      // 1. Récupérer l'ID depuis l'input
+        const id = characterIdInput.value;
+      // 2. Faire la requête fetch avec cet ID
+        fetch(`https://swapi.dev/api/people/${id}`) 
+        .then((response) => {return response.json()});   
+      // 3. Afficher les informations dans characterInfo
+        .then(data) => {
+            characterInfo.innerHTML = 
+            `<h1>${data.name}</h1>`;}}
+      // 4. Gérer les erreurs si le personnage n'existe pas
+    
+  
+    loadButton.addEventListener("click", loadCharacter);
+  </script>
+  
+  <style>
+    .swapi-interface {
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+  
+    .swapi-interface input {
+      padding: 5px;
+      margin-right: 10px;
+    }
+  
+    .swapi-interface button {
+      padding: 5px 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  
+    #characterInfo {
+      margin-top: 20px;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 4px;
+    }
+  </style>
