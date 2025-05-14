@@ -1,0 +1,201 @@
+<div class="game-container">
+  <canvas id="gameCanvas" width="800" height="400"></canvas>
+  <div id="score">Score : 0</div>
+</div>
+
+<style>
+  .game-container {
+    text-align: center;
+    margin: 20px;
+  }
+  #gameCanvas {
+    border: 2px solid black;
+    background: #87ceeb; /* Ciel bleu */
+  }
+  #score {
+    font-size: 24px;
+    margin-top: 10px;
+  }
+</style>
+
+<script>
+  // Configuration du jeu
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const scoreElement = document.getElementById("score");
+
+// Paramètres du jeu
+const GRAVITY = 0.2;
+const JUMP_FORCE = -5  ;
+const OBSTACLE_SPEED = 3;
+const OBSTACLE_WIDTH = 50;
+const GAP_HEIGHT = 150;
+
+// État du jeu
+let score = 0;
+let gameOver = false;
+
+// Joueur (le cercle)
+const player = {
+  x: 150,
+  y: canvas.height / 2,
+  radius: 20,
+  velocity: 0,
+
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = "yellow";
+    ctx.fill();
+    ctx.strokeStyle = "black";
+    ctx.stroke();
+  },
+
+  update() {
+    this.velocity += GRAVITY;
+    this.y += this.velocity;
+
+    // Empêcher le joueur de sortir du canvas
+    if (this.y + this.radius > canvas.height) {
+      this.y = canvas.height - this.radius;
+      this.velocity = 0;
+    }
+    if (this.y - this.radius < 0) {
+      this.y = this.radius;
+      this.velocity = 0;
+    }
+  },
+
+  jump() {
+    this.velocity = JUMP_FORCE;
+  },
+};
+
+// Obstacles
+const obstacles = [];
+class Obstacle {
+  constructor() {
+    this.x = canvas.width;
+    this.width = OBSTACLE_WIDTH;
+    this.gapStart = Math.random() * (canvas.height - GAP_HEIGHT);
+    this.passed = false;
+  }
+
+  draw() {
+    ctx.fillStyle = "green";
+    // Obstacle du haut
+    ctx.fillRect(this.x, 0, this.width, this.gapStart);
+    // Obstacle du bas
+    ctx.fillRect(
+      this.x,
+      this.gapStart + GAP_HEIGHT,
+      this.width,
+      canvas.height - (this.gapStart + GAP_HEIGHT),
+    );
+  }
+
+  update() {
+    this.x -= OBSTACLE_SPEED;
+
+    // Vérifier si l'obstacle est passé
+    if (!this.passed && this.x + this.width < player.x) {
+      score++;
+      scoreElement.textContent = `Score : ${score}`;
+      this.passed = true;
+    }
+  }
+
+  collidesWith(player) {
+    // Vérifier la collision avec l'obstacle du haut
+    if (
+      this.x < player.x + player.radius &&
+      this.x + this.width > player.x - player.radius &&
+      player.y - player.radius < this.gapStart
+    ) {
+      return true;
+    }
+
+    // Vérifier la collision avec l'obstacle du bas
+    if (
+      this.x < player.x + player.radius &&
+      this.x + this.width > player.x - player.radius &&
+      player.y + player.radius > this.gapStart + GAP_HEIGHT
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+}
+function gameLoop() {
+  if (gameOver) {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "white";
+    ctx.font = "48px Arial";
+    ctx.fillText("Game Over!", canvas.width / 2 - 100, canvas.height / 2);
+    return;
+  }
+
+  // Effacer le canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Mettre à jour et dessiner le joueur
+  player.update();
+  player.draw();
+
+  // Gérer les obstacles
+  if (
+    obstacles.length === 0 ||
+    obstacles[obstacles.length - 1].x < canvas.width - 300
+  ) {
+    obstacles.push(new Obstacle());
+  }
+
+  // Mettre à jour et dessiner les obstacles
+  for (let i = obstacles.length - 1; i >= 0; i--) {
+    obstacles[i].update();
+    obstacles[i].draw();
+
+    // Vérifier les collisions
+    if (obstacles[i].collidesWith(player)) {
+      gameOver = true;
+    }
+
+    // Supprimer les obstacles hors écran
+    if (obstacles[i].x + OBSTACLE_WIDTH < 0) {
+      obstacles.splice(i, 1);
+    }
+  }
+
+  requestAnimationFrame(gameLoop);
+}
+// Gestion des contrôles
+function handleInput() {
+  if (gameOver) {
+    // Réinitialiser le jeu
+    gameOver = false;
+    score = 0;
+    scoreElement.textContent = "Score : 0";
+    obstacles.length = 0;
+    player.y = canvas.height / 2;
+    player.velocity = 0;
+    gameLoop();
+  } else {
+    player.jump();
+  }
+}
+
+// Support de la touche espace
+document.addEventListener("keydown", (event) => {
+  if (event.code === "Space") {
+    handleInput();
+  }
+});
+
+// Support du clic de souris
+canvas.addEventListener("click", handleInput);
+
+// Démarrer le jeu
+gameLoop();    
+</script>
